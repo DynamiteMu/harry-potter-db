@@ -190,8 +190,32 @@
       grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
     }
     body.mobile-frame-mode .detail-two-col-grid,
-    body.mobile-frame-mode #characterEditForm .grid {
+    body.mobile-frame-mode #characterEditForm .grid,
+    body.mobile-frame-mode #searchControlsRow {
       grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+    }
+    body.mobile-frame-mode #searchControlsRow > div {
+      grid-column: span 1 / span 1 !important;
+      width: 100% !important;
+    }
+    body.mobile-frame-mode #facetDropdownsGrid,
+    body.mobile-frame-mode #columnFilterGrid {
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+    /* Guarantee crisp, high-contrast real-time text rendering inside search inputs on iOS/Android/Desktop */
+    #searchInput,
+    #triviaSearchInput,
+    #patronusFilterInput {
+      color: #ffffff !important;
+      -webkit-text-fill-color: #ffffff !important;
+      caret-color: #fbbf24 !important;
+      background-color: #020617 !important;
+      opacity: 1 !important;
+      font-size: 16px !important;
+      line-height: 1.5 !important;
+      width: 100% !important;
+      min-width: 0 !important;
+      box-sizing: border-box !important;
     }
     @media (max-width: 767px) {
       body {
@@ -342,38 +366,68 @@
 
       <!-- Main Search, Dropdown Filters & Sort Controls -->
       <div class="bg-slate-900/80 border border-slate-800 rounded-xl p-4 shadow-md space-y-4">
-        <!-- Row 1: Search Input + Target Field + Sort Controls -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-3">
-          <!-- Keyword Search -->
-          <div class="lg:col-span-5 relative flex">
-            <select id="searchFieldSelect" aria-label="検索対象項目" class="rounded-l-lg bg-slate-800 border border-r-0 border-slate-700 text-slate-200 text-xs px-2.5 py-2.5 focus:outline-none focus:border-amber-400">
-              <option value="all">全18項目一括</option>
-              <option value="name">通称</option>
-              <option value="fullName">フルネーム</option>
-              <option value="englishName">英語名</option>
-              <option value="affiliation">所属寮・組織</option>
-              <option value="birthday">誕生日・生年月日</option>
-              <option value="wand">杖</option>
-              <option value="patronus">守護霊</option>
-              <option value="family">家族</option>
-              <option value="personality">性格</option>
-              <option value="episodes">主なエピソード</option>
-              <option value="profile">プロフィール</option>
-              <option value="bookTrivia">原作トリビア</option>
-              <option value="actors">俳優・キャスト</option>
-              <option value="movieTrivia">映画トリビア</option>
-              <option value="firstAppearance">初登場</option>
-            </select>
-            <div class="relative flex-1">
-              <input id="searchInput" type="text" placeholder="キャラ名・英語名・呪文・杖・俳優・エピソードで検索…" class="w-full rounded-r-lg bg-slate-950/90 border border-slate-700 px-3.5 py-2.5 pr-9 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-amber-400" />
-              <button id="btnClearSearch" type="button" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-200 text-sm" title="検索語をクリア">✕</button>
+        <!-- Full-Width Prominent Search Box (100% width on Smartphone & PC) -->
+        <div class="w-full space-y-2">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <label for="searchInput" class="text-xs sm:text-sm font-bold text-amber-300 flex items-center gap-1.5">
+              <span>🔍</span> キャラクター・キーワード検索
+            </label>
+            <div class="flex items-center gap-1.5">
+              <span class="text-[11px] text-slate-400">検索対象:</span>
+              <select id="searchFieldSelect" aria-label="検索対象項目" class="rounded-lg bg-slate-800 border border-slate-700 text-amber-200 text-xs px-2.5 py-1.5 focus:outline-none focus:border-amber-400">
+                <option value="all">全19項目一括</option>
+                <option value="name">通称</option>
+                <option value="fullName">フルネーム</option>
+                <option value="englishName">英語名</option>
+                <option value="affiliation">所属寮・組織</option>
+                <option value="birthday">誕生日・生年月日</option>
+                <option value="wand">杖</option>
+                <option value="patronus">守護霊</option>
+                <option value="family">家族</option>
+                <option value="personality">性格</option>
+                <option value="episodes">主なエピソード</option>
+                <option value="profile">プロフィール</option>
+                <option value="bookTrivia">原作トリビア</option>
+                <option value="actors">俳優・キャスト</option>
+                <option value="movieTrivia">映画トリビア</option>
+                <option value="firstAppearance">初登場</option>
+              </select>
             </div>
           </div>
 
+          <!-- 100% Full-Width Text Input Box -->
+          <div class="relative w-full">
+            <input
+              id="searchInput"
+              type="text"
+              inputmode="search"
+              autocomplete="off"
+              autocorrect="off"
+              spellcheck="false"
+              placeholder="ここに文字を入力（例：ハリー、マルフォイ、不死鳥、7月31日…）"
+              class=" block w-full rounded-xl bg-slate-950 border-2 border-amber-500/50 focus:border-amber-400 px-4 py-3 pr-20 text-base text-white placeholder-slate-400 shadow-inner focus:outline-none transition"
+            />
+            <button id="btnClearSearch" type="button" class="hidden absolute right-2 top-1/2 -translate-y-1/2 px-2.5 py-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-bold border border-slate-600" title="検索語をクリア">
+              ✕ クリア
+            </button>
+          </div>
+
+          <!-- Real-Time Typed Text & Hit Count Feedback Bar -->
+          <div id="liveSearchFeedback" class="hidden items-center justify-between gap-2 px-3 py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/40 text-xs text-amber-200">
+            <div class="truncate">
+              <span>⌨️ 入力中の検索ワード: </span>
+              <strong id="liveSearchWord" class="text-white font-bold underline decoration-amber-400"></strong>
+            </div>
+            <span id="liveSearchCount" class="shrink-0 font-bold text-amber-300"></span>
+          </div>
+        </div>
+
+        <!-- Row 2: Sort Field & View Mode Switcher -->
+        <div id="searchControlsRow" class="grid grid-cols-1 lg:grid-cols-12 gap-3 pt-1">
           <!-- Sort Field & Order -->
-          <div class="lg:col-span-4 flex items-center gap-2">
+          <div class="lg:col-span-7 flex items-center gap-2">
             <label for="sortFieldSelect" class="text-xs text-slate-400 whitespace-nowrap">並び替え:</label>
-            <select id="sortFieldSelect" class="flex-1 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-xs sm:text-sm px-3 py-2.5 focus:outline-none focus:border-amber-400">
+            <select id="sortFieldSelect" class="flex-1 min-w-0 rounded-lg bg-slate-800 border border-slate-700 text-slate-200 text-xs sm:text-sm px-3 py-2.5 focus:outline-none focus:border-amber-400">
               <option value="id">名鑑登録順 (No.)</option>
               <option value="richness">解説・トリビア充実度順</option>
               <option value="birthday">🎂 誕生日・生年月日順 (1月→12月)</option>
@@ -392,7 +446,7 @@
           </div>
 
           <!-- View Switcher & Advanced Filter Toggle -->
-          <div class="lg:col-span-3 flex items-center justify-between lg:justify-end gap-2">
+          <div class="lg:col-span-5 flex flex-wrap items-center justify-between lg:justify-end gap-2">
             <div class="inline-flex rounded-lg bg-slate-950 p-1 border border-slate-800" role="group" aria-label="表示形式切替">
               <button type="button" data-view="card" class="view-mode-btn px-2.5 py-1.5 rounded-md text-xs font-semibold bg-amber-500 text-slate-950 transition">
                 🃏 カード
@@ -2335,6 +2389,22 @@
       document.getElementById('resultCountText').textContent = total;
       document.getElementById('tabCountBadge').textContent = total;
 
+      const liveFb = document.getElementById('liveSearchFeedback');
+      const liveWord = document.getElementById('liveSearchWord');
+      const liveCount = document.getElementById('liveSearchCount');
+      const rawInputVal = (document.getElementById('searchInput')?.value || state.searchQuery || '');
+      if (liveFb && liveWord && liveCount) {
+        if (rawInputVal.length > 0) {
+          liveFb.classList.remove('hidden');
+          liveFb.classList.add('flex');
+          liveWord.textContent = `「${rawInputVal}」`;
+          liveCount.textContent = `${total} 名ヒット`;
+        } else {
+          liveFb.classList.add('hidden');
+          liveFb.classList.remove('flex');
+        }
+      }
+
       // Active filter summary
       const activeTags = [];
       if (state.quickFaction !== 'all') {
@@ -3858,15 +3928,19 @@
         renderDirectory();
       });
 
-      // Search & Filters
+      // Search & Filters (Supports real-time typing + Japanese IME composition)
       const searchInput = document.getElementById('searchInput');
       const btnClearSearch = document.getElementById('btnClearSearch');
-      searchInput.addEventListener('input', (e) => {
-        state.searchQuery = e.target.value;
-        btnClearSearch.classList.toggle('hidden', !state.searchQuery);
+      const handleSearchImmediate = () => {
+        state.searchQuery = searchInput.value;
+        btnClearSearch.classList.toggle('hidden', ! searchInput.value);
         state.currentPage = 1;
         renderDirectory();
-      });
+      };
+      searchInput.addEventListener('input', handleSearchImmediate);
+      searchInput.addEventListener('keyup', handleSearchImmediate);
+      searchInput.addEventListener('compositionupdate', handleSearchImmediate);
+      searchInput.addEventListener('compositionend', handleSearchImmediate);
       btnClearSearch.addEventListener('click', () => {
         searchInput.value = '';
         state.searchQuery = '';
