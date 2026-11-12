@@ -2245,62 +2245,578 @@ function renderWandsTab() {
   items.slice(0, 40).forEach(c => hydratePortraitImage(c, `img-wand-${c.id}`));
 }
 
-function initQuiz() {
-  const box = document.getElementById('quizBox');
-  const pool = [
-    {
-      q: "映画『謎のプリンス』のスラグ・クラブ等に登場する双子の女子生徒「フローラ・カロー」と「ヘスティア・カロー」について正しい記述はどれ？",
-      options: [
-        "原作小説には登場しない映画オリジナルキャラクターである",
-        "原作第6巻でハリーとダンスを踊ったレイブンクロー生である",
-        "原作第5巻でダンブルドア軍団を設立したメンバーである",
-        "ファンタスティック・ビーストの登場人物である"
-      ],
-      ans: 0,
-      exp: "フローラ・カローとヘスティア・カローは映画『謎のプリンス』『死の秘宝 PART2』に登場する映画オリジナルキャラクターです。原作でカロー姓を持つのは死喰い人のアミカス＆アレクト・カロー兄妹のみです。"
-    },
-    {
-      q: "原作『死の秘宝』の「必要の部屋」で悪霊の火（フィーンドファイヤー）を放ち、自ら命を落とした人物は誰？（※映画版ではゴイルに変更）",
-      options: ["ビンセント・クラッブ", "ブレーズ・ザビニ", "セオドール・ノット", "マーカス・フリント"],
-      ans: 0,
-      exp: "原作ではクラッブが悪霊の火を放って死亡し、ゴイルは生き残りますが、映画版ではクラッブの代わりにザビニが同行し、ゴイルが悪霊の火を放って死亡します。"
-    },
-    {
-      q: "原作『不死鳥の騎士団』でアンブリッジにダンブルドア軍団の秘密を密告し、顔に「密告者（SNEAK）」の吹き出物ができた人物は？",
-      options: ["マリエッタ・エッジコム", "チョウ・チャン", "パドマ・パチル", "ロミルダ・ベイン"],
-      ans: 0,
-      exp: "原作ではチョウの親友マリエッタ・エッジコムが密告しました。映画版ではマリエッタが登場せず、チョウが真実薬を飲まされる展開に変更されました。"
+const QUIZ_QUESTION_BANK = [
+  {
+    q: "映画『謎のプリンス』のスラグ・クラブ等に登場する双子の女子生徒「フローラ・カロー」と「ヘスティア・カロー」について正しい記述はどれ？",
+    correct: "原作小説には登場しない映画オリジナルキャラクターである",
+    wrongs: [
+      "原作第6巻でハリーとダンスを踊ったレイブンクロー生である",
+      "原作第5巻でダンブルドア軍団を設立したメンバーである",
+      "『ファンタスティック・ビースト』の登場人物である"
+    ],
+    exp: "フローラ・カローとヘスティア・カローは映画『謎のプリンス』『死の秘宝 PART2』に登場する映画オリジナルキャラクター（演：アンバー＆ルビー・エバンズ）です。原作でカロー姓を持つのは死喰い人のアミカス＆アレクト・カロー兄妹のみです。",
+    charName: "フローラ・カロー"
+  },
+  {
+    q: "原作『死の秘宝』の「必要の部屋」で悪霊の火（フィーンドファイヤー）を放ち、自ら制御できなくなって命を落とした人物は誰？（※映画版ではゴイルに変更）",
+    correct: "ビンセント・クラッブ",
+    wrongs: ["ブレーズ・ザビニ", "セオドール・ノット", "マーカス・フリント"],
+    exp: "原作ではクラッブが悪霊の火を放って死亡し、ゴイルはハリーたちに救出されて生き残りますが、映画版ではクラッブの代わりにザビニが同行し、ゴイルが悪霊の火を放って死亡します。",
+    charName: "ビンセント・クラッブ"
+  },
+  {
+    q: "原作『不死鳥の騎士団』でアンブリッジにダンブルドア軍団の秘密を密告し、ハーマイオニーの呪いで顔に「密告者（SNEAK）」の吹き出物ができた人物は？",
+    correct: "マリエッタ・エッジコム",
+    wrongs: ["チョウ・チャン", "パドマ・パチル", "ロミルダ・ベイン"],
+    exp: "原作ではチョウ・チャンの親友マリエッタ・エッジコムが密告しました。映画版ではマリエッタが登場せず、チョウが真実薬（ベリタセラム）を飲まされる展開に変更されました。",
+    charName: "マリエッタ・エッジコム"
+  },
+  {
+    q: "映画第1・2作でハッフルパフ生「スーザン・ボーンズ」を演じたエレノア・コロンバスに関する事実として正しいものはどれ？",
+    correct: "クリス・コロンバス監督の実の娘であり、数少ないアメリカ人キャストの一人である",
+    wrongs: [
+      "原作者J.K.ローリングの姪であり、スコットランド出身である",
+      "マギー・スミス（マクゴナガル役）の孫娘である",
+      "映画第3作以降はハーマイオニーのスタントダブルを務めた"
+    ],
+    exp: "エレノア・コロンバスは第1・2作の監督クリス・コロンバスの実の娘であり、原則イギリス・アイルランド人限定だったハリポタ映画において特別カメオ枠で出演した数少ないアメリカ人キャストの一人です。",
+    charName: "スーザン・ボーンズ"
+  },
+  {
+    q: "原作小説における「パーバティ・パチル」と「パドマ・パチル」の双子の姉妹の所属寮の組み合わせとして正しいものはどれ？",
+    correct: "パーバティがグリフィンドール寮、パドマがレイブンクロー寮",
+    wrongs: [
+      "二人ともグリフィンドール寮",
+      "二人ともレイブンクロー寮",
+      "パーバティがハッフルパフ寮、パドマがスリザリン寮"
+    ],
+    exp: "原作ではパーバティがグリフィンドール、パドマがレイブンクロー（5年生で監督生）と別々の寮に組分けされています。映画版では二人ともグリフィンドール寮に変更されました。",
+    charName: "パドマ・パチル"
+  },
+  {
+    q: "映画『炎のゴブレット』から登場し、原作のコリン・クリービーとデニス・クリービー兄弟の役割を統合して作られた映画オリジナルキャラクターは誰？",
+    correct: "ナイジェル・ウォルパート",
+    wrongs: ["ジミー・ピークス", "リッチー・クート", "マイケル・コーナー"],
+    exp: "ウィリアム・メリングが演じたナイジェル・ウォルパートは原作小説には登場しない映画オリジナルキャラクターです。",
+    charName: "ナイジェル・ウォルパート"
+  },
+  {
+    q: "第5巻『不死鳥の騎士団』でフレッドとジョージ・ウィーズリーによって壊れた「姿をくらますキャビネット棚」に押し込まれ、のちにドラコ・マルフォイが死喰い人を城に引き入れるヒントを与えたスリザリン生は？",
+    correct: "グラハム・モンタギュー",
+    wrongs: ["マーカス・フリント", "エイドリアン・ピューシー", "カシアス・ウォリントン"],
+    exp: "グラハム・モンタギューがキャビネット棚に閉じ込められ、ボージン・アンド・バークスとホグワーツの間を行き来する音を聞いた体験談をドラコに話したことが第6巻の計画に繋がりました。",
+    charName: "グラハム・モンタギュー"
+  },
+  {
+    q: "原作『謎のプリンス』の天文台の戦いの後、逃走中にハグリッドの小屋に火を放った死喰い人は誰？（※映画版ではベラトリックスに変更）",
+    correct: "ソフィアン・ロウル（ソーフィン・ロウル）",
+    wrongs: ["アントニン・ドロホフ", "コーバン・ヤックスリー", "アミカス・カロー"],
+    exp: "原作では巨漢の死喰い人ソーフィン・ロウルがハグリッドの小屋に火を放ちました（さらに味方のギボンを誤射して殺害しています）。",
+    charName: "ソフィアン・ロウル"
+  },
+  {
+    q: "ヴォルデモートの分霊箱「スリザリンのロケット」を洞窟から回収し、「R.A.B.」のイニシャルで偽のロケットと手紙を残して18歳で命を落とした人物は？",
+    correct: "レギュラス・ブラック",
+    wrongs: ["アルファード・ブラック", "オリオン・ブラック", "フィニアス・ナイジェラス・ブラック"],
+    exp: "シリウス・ブラックの弟レギュラス・アークトゥルス・ブラック（R.A.B.）は、屋敷しもべ妖精クリーチャーの誇りと命を守るためにヴォルデモートに背き、自ら毒薬を飲んでロケットをすり替えました。",
+    charName: "レギュラス・ブラック"
+  },
+  {
+    q: "ホグワーツで唯一の「ゴーストの教師」であり、教員室の椅子で居眠りしている間に死亡して自分の肉体を置き忘れたまま『魔法史』を教え続けている教授は？",
+    correct: "カスバート・ビンズ",
+    wrongs: ["シルバヌス・ケトルバーン", "クィリナス・クィレル", "ガラテア・メリソート"],
+    exp: "魔法史を担当するカスバート・ビンズ先生は、原作第2巻でハーマイオニーの質問に答えて「秘密の部屋」の伝説を生徒たちに語りました（映画版ではマクゴナガル先生に変更）。",
+    charName: "カスバート・ビンズ"
+  },
+  {
+    q: "12世紀に活躍した「ポッター家の始祖」であり、現在でも使われている『骨生え薬（スケレ・グロ）』や『元気回復薬』の原型を発明して一族の財産を築いた人物は？",
+    correct: "リンフレッド",
+    wrongs: ["ハードウィン・ポッター", "フリーモント・ポッター", "ヘンリー・ポッター"],
+    exp: "スティンチコムのリンフレッドはマグルの隣人たちから「ザ・ポッターアー（壺作り屋）」というあだ名で親しまれ、それが「ポッター」姓の由来となりました。",
+    charName: "リンフレッド"
+  },
+  {
+    q: "ハリー・ポッターの祖父であり、大ヒットヘアケア商品『スリーク・エージーの直毛薬』を発明してポッター家の資産を4倍に増やした人物は？",
+    correct: "フリーモント・ポッター",
+    wrongs: ["ヘンリー・ポッター", "ラルストン・ポッター", "チャールズ・ポッター"],
+    exp: "ジェームズ・ポッターの父フリーモント・ポッターは、妻ユーフェミアと共に家出してきたシリウス・ブラックも実の息子同然に迎え入れました。",
+    charName: "フリーモント・ポッター"
+  },
+  {
+    q: "『吟遊詩人ビードルの物語』の「三人兄弟の物語」のモデルとなったペベレル三兄弟のうち、「透明マント」を授かりハリー・ポッターの直系の先祖となった三男は誰？",
+    correct: "イグノタス・ペベレル",
+    wrongs: ["アンティオク・ペベレル", "カドモス・ペベレル", "ハードウィン・ポッター"],
+    exp: "長男アンティオクは「ニワトコの杖」、次男カドモス（ゴーント家の先祖）は「蘇りの石」、三男イグノタス（ポッター家の先祖）は「透明マント」を受け取りました。",
+    charName: "イグノタス・ペベレル"
+  },
+  {
+    q: "中世に「マーリン騎士団」を創設してマグルとの平和的共存を説いた伝説の大魔術師マーリンは、ホグワーツのどの寮の出身とされている？",
+    correct: "スリザリン寮",
+    wrongs: ["グリフィンドール寮", "レイブンクロー寮", "ハッフルパフ寮"],
+    exp: "公式設定において、マーリンはホグワーツ創設初期の入学生であり、サラザール・スリザリンが直接指導したスリザリン寮の出身者です。",
+    charName: "マーリン"
+  },
+  {
+    q: "1798年にイギリス魔法省の歴史上「初めての女性魔法大臣」に就任し、国際魔法協力部を新設してクィディッチW杯の英国招致を実現させたハッフルパフ出身の人物は？",
+    correct: "アーテミシア・ラフキン（アーテミシア・ルクフィン）",
+    wrongs: ["ミリセント・バグノールド", "ウィルヘルミナ・タフテ", "エルフリーダ・クラッグ"],
+    exp: "アーテミシア・ラフキン（データベース表記：アーテミシア・ルクフィン）は史上初の女性魔法大臣として蛙チョコレートのカードにも収録されています。",
+    charName: "アーテミシア・ルクフィン"
+  },
+  {
+    q: "1962年にイギリス魔法省の歴史上「初めてのマグル生まれの魔法大臣」に選出された人物は誰？（※ハーマイオニー・グレンジャーより前の先駆者）",
+    correct: "ノビー・リーチ",
+    wrongs: ["グローガン・スタンプ", "ファリス・スパーヴィン", "ヘスフェストゥス・ゴア"],
+    exp: "ノビー・リーチは1962年に初のマグル生まれの魔法大臣となりましたが、1968年にアブラクサス・マルフォイの陰謀による謎の病で辞任を余儀なくされました。",
+    charName: "ノビー・リーチ"
+  },
+  {
+    q: "1981年11月1日、ヴォルデモート失脚の祝賀騒ぎで機密保持法違反を問われた際、「パーティーを楽しむ我々の不可侵の権利を主張します！」という名言を放った当時の魔法大臣は？",
+    correct: "ミリセント・バグノールド",
+    wrongs: ["コーネリウス・ファッジ", "アメリア・ボーンズ", "グリゼルダ・マーチバンクス"],
+    exp: "コーネリウス・ファッジの前任大臣であるミリセント・バグノールド（レイブンクロー出身）が国際魔法使い連盟の査問会で放った歴史的名言です。",
+    charName: "ミリセント・バグノールド"
+  },
+  {
+    q: "中世にマグルの魔女狩りで「炎凍結呪文」を使って火あぶりの刑をくすぐったい感触に変え、わざと変装して47回も火あぶりを楽しんだという魔女は？",
+    correct: "変人ウェンデリン",
+    wrongs: ["変人ウリック", "キルケ", "モルガン・ル・フェイ"],
+    exp: "第3巻『アズカバンの囚人』の冒頭で、ハリーが夜中に毛布の中で書いていた魔法史の夏休み宿題のテーマとしても登場します。",
+    charName: "変人ウェンデリン"
+  },
+  {
+    q: "頭にかぶったクラゲを帽子代わりにして眠り、50匹のペットのオーグリーが一斉に鳴いた夜に「自分が死んで幽霊になった」と思い込んで壁に頭から突っ込み脳震盪を起こした奇人は？",
+    correct: "変人ウリック",
+    wrongs: ["腐ったハーポ", "クリスピン・クロンク", "アルベリック・グラニオン"],
+    exp: "「変人ウリック（Uric the Oddball）」は蛙チョコレートのカードにも収録され、第1巻の魔法史の授業などでも言及される有名な奇人です。",
+    charName: "変人ウリック"
+  },
+  {
+    q: "古代ギリシャの闇の魔法使いであり、史上初めて「バジリスク」を孵化させ、さらに史上初めて「分霊箱（ホークラックス）」を作ったとされる人物は？",
+    correct: "腐ったハーポ",
+    wrongs: ["エクリズディス", "悪人エメリック", "ゴデロット"],
+    exp: "「腐ったハーポ（Herpo the Foul）」はパーセルマウスでもあり、鶏の卵をヒキガエルに温めさせてバジリスクを生み出しました。",
+    charName: "腐ったハーポ"
+  },
+  {
+    q: "イギリスで唯一の「完全に魔法族だけの村」であるホグズミード村を創設したと伝えられる、ハッフルパフ寮出身の歴史上の魔法使いは？",
+    correct: "ヘンギスト（ウッドクロフトのヘンギスト）",
+    wrongs: ["ボウマン・ライト", "イグナシア・ワイルドスミス", "グランモア・ピークス"],
+    exp: "ウッドクロフトのヘンギストはマグルの迫害から逃れてスコットランドにホグズミード村を創設し、「三本の箒」が彼の自宅だったと伝えられています。",
+    charName: "ヘンギスト"
+  },
+  {
+    q: "クィディッチで乱獲され絶滅寸前だった魔法鳥「ゴールデン・スニジェット」に代わる金属球『金のスニッチ』を発明した、ゴドリックの谷の鍛冶職人は？",
+    correct: "ボウマン・ライト",
+    wrongs: ["バーバリアス・ブラッグ", "モンタギュー・ナイトリー", "ガリバー・ポケビー"],
+    exp: "半純血の鍛冶職人ボウマン・ライトが「金のスニッチ」を発明したことで、スニジェットの保護と近代クィディッチのルールが確立されました。",
+    charName: "ボウマン・ライト"
+  },
+  {
+    q: "暖炉と暖炉を繋いで移動する『煙突飛行粉（フルーパウダー）』を13世紀に発明した、ハッフルパフ出身の魔女は誰？",
+    correct: "イグナシア・ワイルドスミス",
+    wrongs: ["フィリダ・スポア", "ミランダ・ゴショーク", "ヘスパー・スターキー"],
+    exp: "イグナシア・ワイルドスミス（1227〜1320）は煙突飛行粉の発明者として蛙チョコレートのカードに名を連ねています。",
+    charName: "イグナシア・ワイルドスミス"
+  },
+  {
+    q: "北米最大の魔法学校『イルヴァーモーニー魔法魔術学校』を、ノー・マジ（マグル）の夫ジェームズ・スチュワードと共に創設したアイルランド出身の魔女は？",
+    correct: "イソルト・セイヤー",
+    wrongs: ["ゴルムレイス・ゴーント", "セラフィーナ・ピッカリー", "エミリー・ラパポート"],
+    exp: "サラザール・スリザリンの血を引くイソルト・セイヤーは、狂信的な伯母ゴルムレイス・ゴーントから逃れてメイフラワー号で北米へ渡り、イルヴァーモーニーを創設しました。",
+    charName: "イソルト・セイヤー"
+  },
+  {
+    q: "1790年の北米魔法界において、スカウラーの子孫であるマグルの美青年バーソロミュー・ベアボーンに騙されてMACUSAの秘密を漏洩させ、厳格な『ラパポート法』制定の原因を作った女性は？",
+    correct: "ドーカス・トウェルブツリーズ",
+    wrongs: ["ドーカス・メドウズ", "チャスティティ・ベアボーン", "クラリス・トレンブレイ"],
+    exp: "ドーカス・トウェルブツリーズの大失態により、北米ではノー・マジとの結婚や友人関係まで全面禁止する「ラパポート法」が制定されました。",
+    charName: "ドーカス・トウェルブツリーズ"
+  },
+  {
+    q: "第6巻『謎のプリンス』でハリーが使った古本の教科書『上級魔法薬づくり（Advanced Potion-Making）』の本来の著者は誰？",
+    correct: "リバティウス・ボラージ",
+    wrongs: ["スカーピッド（スカーピン）", "ミランダ・ゴショーク", "フィリダ・スポア"],
+    exp: "リバティウス・ボラージが執筆した教科書に、学生時代のセブルス・スネイプ（半純血のプリンス）が独自の改良レシピや呪文を書き込んでいました。",
+    charName: "リバティウス・ボラージ"
+  },
+  {
+    q: "第4巻『炎のゴブレット』でハグリッドが実験的飼育禁止令に違反して作り出した「尻尾爆発スクリュート」は、何と何を交配させた生物？",
+    correct: "マンティコア（人面獅子）とファイア・クラブ（火吹きガニ）",
+    wrongs: [
+      "キメラとノルウェー・リッジバック",
+      "アクロマンチュラとバジリスク",
+      "グラップホーンとエルンペント"
+    ],
+    exp: "ハグリッドがマンティコアとファイア・クラブを密かに交配させて生み出した極めて危険な新種生物が「尻尾爆発スクリュート」です。",
+    charName: "尻尾爆発スクリュート"
+  },
+  {
+    q: "生前は一度も鳴き声を上げないが、「死ぬ瞬間」にだけ一生の間に聞いたすべての音を最後から最初へ逆再生で一気に叫び尽くす青い小鳥（真実薬や記憶薬の原料）は？",
+    correct: "ジョバーノール",
+    wrongs: ["フーパー", "ディリコール", "ゴールデン・スニジェット"],
+    exp: "ジョバーノール（Jobberknoll）は死ぬ瞬間に生涯で聞いた音をすべて逆再生で叫ぶ習性を持ち、その羽根は真実薬や記憶薬の原料になります。",
+    charName: "ジョバーノール"
+  },
+  {
+    q: "モーリシャス島原産の飛べない鳥で、危険が迫るとパッと瞬間移動して逃げる能力を持ち、マグルからは「絶滅したドードー鳥」だと思われている魔法生物は？",
+    correct: "ディリコール",
+    wrongs: ["ビリーウィグ", "ムーンカーフ", "オカミー"],
+    exp: "ディリコール（Diricawl）はマグルの世界では「ドードー」として知られ、瞬間移動で姿を消したためマグルが「自分たちが絶滅させてしまった」と反省するきっかけになりました。",
+    charName: "ディリコール"
+  },
+  {
+    q: "第7巻でゼノフィリウス・ラブグッドが自宅に「しわしわ角スノーカクの角」だと信じて飾っており、呪文が当たってラブグッド家を大爆発させたアフリカ原産の大型生物は？",
+    correct: "エルンペント",
+    wrongs: ["グラップホーン", "ヌンドゥ", "ズーウー"],
+    exp: "エルンペントの角には触れたものを大爆発させる液体が詰まっており、ハーマイオニーの警告を信じなかったゼノフィリウスの呪文が当たって家が吹き飛びました。",
+    charName: "エルンペント"
+  },
+  {
+    q: "ゲーム『ホグワーツ・レガシー』に登場するスリザリン寮の5年生で、サラザール・スリザリンの直系子孫でありながら生まれつき全盲で杖の赤い光で周囲を感知し、闇の魔術を誰よりも憎んでいる親友は？",
+    correct: "オミニス・ゴーント",
+    wrongs: ["セバスチャン・サロウ", "ギャレス・ウィーズリー", "アミット・タッカー"],
+    exp: "オミニス・ゴーントは幼少期に家族からマグルへのクルーシオを強要されたトラウマから闇の魔術を深く憎み、親友セバスチャンの暴走を止めようと苦悩します。",
+    charName: "オミニス・ゴーント"
+  },
+  {
+    q: "『ホグワーツ・レガシー』で「闇の魔術に対する防衛術」を教える老教授であり、かつて魔法省神秘部で「時間」を研究中に事故で何十年分もの年齢を一気に老いてしまった人物は？",
+    correct: "ダイナ・ヘキャット",
+    wrongs: ["マチルダ・ウィーズリー", "ミラベル・ガーリック", "サティヤバティ・シャー"],
+    exp: "ダイナ・ヘキャット教授は元「無言者（アン・スピーカブル）」であり、時間魔法の事故によって若くして老婦人の姿になった経歴を持ちます。",
+    charName: "ダイナ・ヘキャット"
+  },
+  {
+    q: "『ホグワーツ・レガシー』において、かつて「人間の心から苦痛（痛み）そのものを抜き取る古代魔術」を開発して暴走し、4人の「守護者」と対立した元防衛術教授は？",
+    correct: "イシドーラ・モーガナック",
+    wrongs: ["ニーフ・フィッツジェラルド", "パーシバル・ラッカム", "シローナ・ライアン"],
+    exp: "イシドーラ・モーガナックが人々から抜き取った負の感情の魔力をゴブリン銀の保管所に溜め込んだことが、1890年代のランロクの反乱の火種となりました。",
+    charName: "イシドーラ・モーガナック"
+  },
+  {
+    q: "舞台『ハリー・ポッターと呪いの子』において、アルバス・ポッターとスコーピウス・マルフォイがホグワーツ特急の屋根から飛び降りようとした際に立ち塞がり、「190年間一度も生徒を逃がしたことはない」と語った人物は？",
+    correct: "車内販売魔女",
+    wrongs: ["マダム・フーチ", "イルマ・ピンス", "ポピー・ポンフリー"],
+    exp: "『呪いの子』では、いつも優しい車内販売魔女が実はパンプキン・パスティ爆弾と変形する手で生徒の脱走を防ぐ番人だったという衝撃の設定が描かれました。",
+    charName: "車内販売魔女"
+  },
+  {
+    q: "第4巻『炎のゴブレット』の第1章で、リドル・ハウスの老庭番としてヴォルデモートに立ち向かい「面と向かって俺の目を見て言ってみろ」と啖呵を切って命を落とした勇敢なマグルは？",
+    correct: "フランク・ブライス",
+    wrongs: ["ロバーツ氏", "トム・リドル・シニア", "ハーバート・チョーリー"],
+    exp: "フランク・ブライスは戦争で負傷した足を引きずりながら一歩も退かず、のちに墓地でハリーの杖から現れた彼の「霊のこだま」もハリーを力強く励ましました。",
+    charName: "フランク・ブライス"
+  },
+  {
+    q: "第5巻で聖マンゴ病院の長期入院病棟に入院していた「神秘部」の職員ブロデリック・ボードは、回復しかけたクリスマスの夜に死喰い人から何を送りつけられて暗殺された？",
+    correct: "鉢植えに偽装した『悪魔の罠（デビルズ・スネア）』",
+    wrongs: [
+      "呪われたオパールのネックレス",
+      "毒入りの蜂蜜酒（ミード）",
+      "噛みつき本『怪物的な怪物の本』"
+    ],
+    exp: "癒者のミリアム・ストラウトが普通の観葉植物（フランジパニ）だと信じ込んでベッド脇に置いた結果、夜間に悪魔の罠に首を絞められて暗殺されました。",
+    charName: "ブロデリック・ボード"
+  },
+  {
+    q: "ハッフルパフの末裔である裕福な老婦人ヘプジバ・スミスがトム・リドルに殺害された際、記憶を改ざんされて「自分がココアに砂糖と間違えて毒を入れた」と自白させられた屋敷しもべ妖精は？",
+    correct: "ホッキー",
+    wrongs: ["ウィンキー", "クリーチャー", "ディーク"],
+    exp: "ダンブルドアがホッキーから採取した「憂いの篩の記憶」によって、ヴォルデモートがハッフルパフのカップとスリザリンのロケットを奪った事実が判明しました。",
+    charName: "ホッキー"
+  },
+  {
+    q: "映画『死の秘宝 PART1』冒頭の「7人のポッター作戦」などで共演した、実生活で「本当の親子（父と長男）」であるキャストが演じたキャラクターの組み合わせはどれ？",
+    correct: "アラスター・ムーディ（父）とビル・ウィーズリー（長男）",
+    wrongs: [
+      "ルシウス・マルフォイ（父）とドラコ・マルフォイ（長男）",
+      "アーサー・ウィーズリー（父）とロン・ウィーズリー（長男）",
+      "バーティ・クラウチ・シニア（父）とクラウチ・ジュニア（長男）"
+    ],
+    exp: "マッドアイ・ムーディ役のブレンダン・グリーソンと、ビル・ウィーズリー役のドーナル・グリーソンは実の父子です。",
+    charName: "ビル・ウィーズリー"
+  }
+];
+
+let quizSession = null;
+
+function shuffleArray(arr) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const tmp = a[i];
+    a[i] = a[j];
+    a[j] = tmp;
+  }
+  return a;
+}
+
+function buildDynamicCharacterQuestions() {
+  const dyn = [];
+  // 1. Patronus questions from database
+  const patChars = characters.filter(c => c.patronus && !['不明', 'なし'].includes(c.patronus) && !c.patronus.includes('なし'));
+  const allPats = Array.from(new Set(patChars.map(c => c.patronus)));
+  patChars.forEach(c => {
+    const wrongs = shuffleArray(allPats.filter(p => p !== c.patronus)).slice(0, 3);
+    if (wrongs.length === 3) {
+      dyn.push({
+        q: `「${c.name}（${c.englishName}）」が生み出す守護霊（パトローナス）の姿として正しいものはどれ？`,
+        correct: c.patronus,
+        wrongs: wrongs,
+        exp: `${c.name}の守護霊は「${c.patronus}」です。${c.profile}`,
+        charName: c.name
+      });
     }
-  ];
-  const idx = window.__quizIdx || 0;
-  const item = pool[idx % pool.length];
+  });
+
+  // 2. Birthday questions from database
+  const bdayChars = characters.filter(c => c.birthday && c.birthday !== '不明' && !c.birthday.includes('頃'));
+  const allBdays = Array.from(new Set(bdayChars.map(c => c.birthday)));
+  bdayChars.forEach(c => {
+    const wrongs = shuffleArray(allBdays.filter(b => b !== c.birthday)).slice(0, 3);
+    if (wrongs.length === 3) {
+      dyn.push({
+        q: `「${c.name}（${c.englishName}）」の公式設定における誕生日・生年月日として正しいものはどれ？`,
+        correct: c.birthday,
+        wrongs: wrongs,
+        exp: `${c.name}の誕生日は「${c.birthday}」です。`,
+        charName: c.name
+      });
+    }
+  });
+
+  return dyn;
+}
+
+function startNewQuizSession() {
+  const combinedPool = QUIZ_QUESTION_BANK.concat(buildDynamicCharacterQuestions());
+  const shuffled = shuffleArray(combinedPool);
+
+  // Pick 10 strictly unique questions (no duplicate question text or same target character twice)
+  const selected = [];
+  const usedQuestions = new Set();
+  const usedCharNames = new Set();
+
+  for (const item of shuffled) {
+    if (selected.length >= 10) break;
+    if (usedQuestions.has(item.q)) continue;
+    if (item.charName && usedCharNames.has(item.charName)) continue;
+    usedQuestions.add(item.q);
+    if (item.charName) usedCharNames.add(item.charName);
+
+    const options = shuffleArray([item.correct, ...item.wrongs]);
+    const ansIndex = options.indexOf(item.correct);
+    selected.push({
+      q: item.q,
+      options: options,
+      ans: ansIndex,
+      correctText: item.correct,
+      exp: item.exp,
+      charName: item.charName || null,
+      userChoice: null,
+      isCorrect: null
+    });
+  }
+
+  quizSession = {
+    questions: selected,
+    currentIndex: 0,
+    score: 0,
+    answeredCurrent: false,
+    finished: false
+  };
+  renderQuizCurrentState();
+}
+
+function initQuiz() {
+  if (!quizSession) {
+    startNewQuizSession();
+  } else {
+    renderQuizCurrentState();
+  }
+}
+
+function getScoreEvaluation(score) {
+  if (score === 10) {
+    return {
+      grade: "O（Outstanding／優・最高栄誉賞）",
+      badgeColor: "#D4AF37",
+      title: "🏆 パーフェクト達成！魔法界最高峰の知識王！",
+      comment: "「マーリンの髭！10問全問正解です！」ハーマイオニー・グレンジャーやアルバス・ダンブルドア校長さえも感嘆する圧倒的な知識量です。原作小説の細かな考証から映画版の裏設定まで完璧にマスターしています。魔法省の筆頭闇祓い、あるいはホグワーツの次期魔法史教授としても即戦力間違いなし！蛙チョコレートのカードにあなたの名前が載る日も近いでしょう。"
+    };
+  } else if (score >= 8) {
+    return {
+      grade: "O（Outstanding／優）",
+      badgeColor: "#50C878",
+      title: "✨ 優秀賞！N.E.W.T.特待生レベルの博識ぶり！",
+      comment: "素晴らしい成績です！主要な登場人物だけでなく、脇役たちのエピソードや原作と映画の違いまでしっかり網羅されています。マクゴナガル先生も『見事です、あなたの寮に50点を与えます！』と誇らしげに微笑んでいます。次は10問全問正解のパーフェクトを狙ってみましょう！"
+    };
+  } else if (score >= 6) {
+    return {
+      grade: "E（Exceeds Expectations／良）",
+      badgeColor: "#64B5F6",
+      title: "🎓 合格基準突破！頼れるダンブルドア軍団の上級生レベル！",
+      comment: "合格ラインを余裕で上回る好成績です！魔法界の幅広い知識がしっかり身についており、N.E.W.T.（卒業試験）クラスへの進級が正式に認められます。間違えた問題のキャラクター詳細を開いてエピソードを読むと、さらに深い発見がありますよ！"
+    };
+  } else if (score >= 4) {
+    return {
+      grade: "A（Acceptable／可）",
+      badgeColor: "#FFD54F",
+      title: "📜 なんとか合格！ホグワーツ標準レベル！",
+      comment: "O.W.L.試験の合格ライン（可）に到達しました！基本的なキャラクター知識はバッチリですが、マニアックな裏設定や歴史人物の問題で少し迷ったかもしれません。ロンと一緒に図書館でハーマイオニーにノートを借りて復習すれば、次はさらに高得点が狙えます！"
+    };
+  } else if (score >= 2) {
+    return {
+      grade: "P（Poor／不可）〜 D（Dreadful／落第）",
+      badgeColor: "#FF8A65",
+      title: "🧪 惜しい！スネイプ先生の特別補習コース！",
+      comment: "おっと、地下牢からスネイプ先生の『愚図が…名鑑の394ページを開け』という低い声が聞こえてきそうです！でも大丈夫、この名鑑には633名全員の詳しいエピソードが詰まっています。下の振り返り一覧から気になるキャラクターのカードを開いて、もう一度挑戦してみましょう！"
+    };
+  } else {
+    return {
+      grade: "T（Troll／トロール級・忘却術被害）",
+      badgeColor: "#E57373",
+      title: "🪄 ロックハート先生の『忘却術』を浴びてしまったかも！？",
+      comment: "ギルデロイ・ロックハート先生の逆噴射した『忘却術（オブリビエイト）』を受けて記憶が飛んでしまったようです！まずは『🐸 蛙チョコガチャ』や名鑑一覧でキャラクターたちの面白いエピソードを楽しく読んでから、リベンジしてみてください！"
+    };
+  }
+}
+
+function renderQuizCurrentState() {
+  const box = document.getElementById('quizBox');
+  if (!quizSession) return;
+
+  if (quizSession.finished) {
+    const total = quizSession.questions.length;
+    const score = quizSession.score;
+    const evalInfo = getScoreEvaluation(score);
+
+    box.innerHTML = `
+      <div style="background:var(--bg-card);padding:24px;border-radius:var(--radius-lg);border:2px solid var(--gold);box-shadow:var(--shadow-gold);">
+        <div style="text-align:center;margin-bottom:20px;">
+          <span style="display:inline-block;padding:4px 14px;border-radius:999px;background:rgba(212,175,55,0.18);border:1px solid ${evalInfo.badgeColor};color:${evalInfo.badgeColor};font-weight:700;font-size:0.84rem;margin-bottom:10px;">
+            評定ランク：${escapeHtml(evalInfo.grade)}
+          </span>
+          <h3 style="font-family:'Noto Serif JP',serif;font-size:1.45rem;color:var(--gold-bright);margin-bottom:6px;">
+            ${escapeHtml(evalInfo.title)}
+          </h3>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:2.4rem;font-weight:700;color:#FFFFFF;margin:10px 0;">
+            ${score} <span style="font-size:1.1rem;color:var(--text-sand);">/ ${total} 問正解（正答率 ${Math.round((score / total) * 100)}%）</span>
+          </div>
+          <p style="font-size:0.94rem;color:var(--text-ivory);line-height:1.75;max-width:640px;margin:0 auto;background:rgba(0,0,0,0.32);padding:14px 18px;border-radius:var(--radius-md);border:1px solid var(--gold-dim);text-align:left;">
+            ${escapeHtml(evalInfo.comment)}
+          </p>
+          <div style="margin-top:18px;">
+            <button class="btn btn-gold" style="font-size:0.95rem;padding:11px 24px;" onclick="startNewQuizSession()">
+              🔄 新しい10問で再挑戦する（問題シャッフル）
+            </button>
+          </div>
+        </div>
+
+        <div style="border-top:1px solid var(--gold-dim);padding-top:16px;margin-top:16px;">
+          <h4 style="color:var(--gold);font-size:0.92rem;margin-bottom:12px;">📋 今回の10問の振り返り</h4>
+          <div style="display:flex;flex-direction:column;gap:10px;">
+            ${quizSession.questions.map((item, idx) => {
+              const charObj = item.charName ? characters.find(x => x.name === item.charName) : null;
+              return `
+                <div style="padding:12px 14px;border-radius:var(--radius-sm);background:rgba(0,0,0,0.28);border-left:4px solid ${item.isCorrect ? '#66BB6A' : '#EF5350'};">
+                  <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:4px;">
+                    <strong style="font-size:0.86rem;color:${item.isCorrect ? '#A5D6A7' : '#EF9A9A'};">
+                      第${idx + 1}問：${item.isCorrect ? '⭕ 正解' : '❌ 不正解'}
+                    </strong>
+                    ${charObj ? `<button class="btn btn-sm" onclick="openCharacterModal(${charObj.id})">📖 ${escapeHtml(charObj.name)} の詳細を見る</button>` : ''}
+                  </div>
+                  <div style="font-size:0.88rem;color:var(--text-ivory);margin-bottom:4px;">${escapeHtml(item.q)}</div>
+                  <div style="font-size:0.8rem;color:var(--gold-bright);">正解：${escapeHtml(item.correctText)}</div>
+                </div>
+              `;
+            }).join('')}
+          </div>
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const total = quizSession.questions.length;
+  const idx = quizSession.currentIndex;
+  const item = quizSession.questions[idx];
+  const progressPct = Math.round(((idx + (quizSession.answeredCurrent ? 1 : 0)) / total) * 100);
+  const charObj = item.charName ? characters.find(x => x.name === item.charName) : null;
 
   box.innerHTML = `
-    <div style="background:var(--bg-card);padding:18px;border-radius:var(--radius-md);border:1px solid var(--gold-dim);">
-      <div style="font-size:0.8rem;color:var(--gold);margin-bottom:6px;">問題 ${(idx % pool.length) + 1} / ${pool.length}</div>
-      <h3 style="font-size:1.05rem;margin-bottom:14px;">${escapeHtml(item.q)}</h3>
-      <div style="display:flex;flex-direction:column;gap:8px;">
-        ${item.options.map((opt, i) => `
-          <button class="btn" style="justify-content:flex-start;text-align:left;" onclick="answerQuiz(${i}, ${item.ans}, '${escapeHtml(item.exp)}')">
-            ${i + 1}. ${escapeHtml(opt)}
-          </button>
-        `).join('')}
+    <div style="background:var(--bg-card);padding:20px;border-radius:var(--radius-md);border:1px solid var(--gold-dim);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;flex-wrap:wrap;gap:8px;">
+        <span style="font-size:0.86rem;font-weight:700;color:var(--gold);">
+          第 ${idx + 1} 問 / 全 ${total} 問（重複なしランダム出題）
+        </span>
+        <span style="font-family:'JetBrains Mono',monospace;font-size:0.84rem;color:var(--gold-bright);">
+          現在の正解数: ${quizSession.score} / ${idx + (quizSession.answeredCurrent ? 1 : 0)}
+        </span>
       </div>
-      <div id="quizFeedback" style="margin-top:14px;"></div>
+      <div style="width:100%;height:7px;background:#0E0C0A;border-radius:999px;overflow:hidden;margin-bottom:16px;border:1px solid rgba(212,175,55,0.2);">
+        <div style="width:${progressPct}%;height:100%;background:linear-gradient(90deg, #D4AF37, #F3E5AB);transition:width 0.25s ease;"></div>
+      </div>
+
+      <h3 style="font-size:1.06rem;margin-bottom:16px;line-height:1.6;">${escapeHtml(item.q)}</h3>
+      <div style="display:flex;flex-direction:column;gap:9px;">
+        ${item.options.map((opt, i) => {
+          let btnStyle = "justify-content:flex-start;text-align:left;padding:11px 14px;white-space:normal;line-height:1.45;";
+          if (quizSession.answeredCurrent) {
+            if (i === item.ans) {
+              btnStyle += "background:rgba(30,86,49,0.55);border-color:#80E0A0;color:#FFFFFF;";
+            } else if (i === item.userChoice && i !== item.ans) {
+              btnStyle += "background:rgba(139,30,36,0.55);border-color:#FF8080;color:#FFD0D0;";
+            } else {
+              btnStyle += "opacity:0.55;";
+            }
+          }
+          return `
+            <button class="btn" style="${btnStyle}" ${quizSession.answeredCurrent ? 'disabled' : ''} onclick="answerQuiz(${i})">
+              <strong style="color:var(--gold);margin-right:6px;">${i + 1}.</strong> ${escapeHtml(opt)}
+            </button>
+          `;
+        }).join('')}
+      </div>
+
+      ${quizSession.answeredCurrent ? `
+        <div style="margin-top:16px;padding:14px 16px;border-radius:var(--radius-sm);background:${item.isCorrect ? 'rgba(30,86,49,0.4)' : 'rgba(139,30,36,0.4)'};border:1px solid ${item.isCorrect ? '#80E0A0' : '#FF8080'};">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;">
+            <strong style="font-size:0.96rem;">${item.isCorrect ? '⭕ 正解！' : `❌ 不正解（正解：${escapeHtml(item.correctText)}）`}</strong>
+            ${charObj ? `<button class="btn btn-sm" onclick="openCharacterModal(${charObj.id})">📖 ${escapeHtml(charObj.name)} の名鑑を開く</button>` : ''}
+          </div>
+          <p style="font-size:0.88rem;margin-top:8px;line-height:1.65;">${escapeHtml(item.exp)}</p>
+          <div style="margin-top:12px;display:flex;justify-content:flex-end;">
+            <button class="btn btn-gold" onclick="advanceQuizQuestion()">
+              ${idx + 1 < total ? `次の問題へ（第 ${idx + 2} 問） ▸` : '🏆 10問終了！最終結果と講評を見る ▸'}
+            </button>
+          </div>
+        </div>
+      ` : ''}
     </div>
   `;
 }
 
-function answerQuiz(choice, ans, exp) {
-  const fb = document.getElementById('quizFeedback');
-  const ok = choice === ans;
-  fb.innerHTML = `
-    <div style="padding:12px;border-radius:var(--radius-sm);background:${ok ? 'rgba(30,86,49,0.4)' : 'rgba(139,30,36,0.4)'};border:1px solid ${ok ? '#80E0A0' : '#FF8080'};">
-      <strong>${ok ? '⭕ 正解！' : '❌ おしい！'}</strong>
-      <p style="font-size:0.86rem;margin-top:4px;">${exp}</p>
-      <button class="btn btn-gold btn-sm" style="margin-top:8px;" onclick="window.__quizIdx=(window.__quizIdx||0)+1;initQuiz();">次の問題へ ▸</button>
-    </div>
-  `;
+function answerQuiz(choiceIdx) {
+  if (!quizSession || quizSession.answeredCurrent || quizSession.finished) return;
+  const item = quizSession.questions[quizSession.currentIndex];
+  const ok = choiceIdx === item.ans;
+  item.userChoice = choiceIdx;
+  item.isCorrect = ok;
+  if (ok) quizSession.score += 1;
+  quizSession.answeredCurrent = true;
+  renderQuizCurrentState();
+}
+
+function advanceQuizQuestion() {
+  if (!quizSession) return;
+  if (quizSession.currentIndex + 1 < quizSession.questions.length) {
+    quizSession.currentIndex += 1;
+    quizSession.answeredCurrent = false;
+  } else {
+    quizSession.finished = true;
+  }
+  renderQuizCurrentState();
 }
 
 function renderManageStats() {
