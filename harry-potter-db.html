@@ -2,8 +2,16 @@
 <html lang="ja">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
 <meta name="referrer" content="no-referrer" />
+<meta name="theme-color" content="#0C0A08" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="魔法界名鑑" />
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
+<link rel="manifest" href="manifest.json" />
 <title>魔法界人物名鑑 — Wizarding World Character Archives (全633名・映画スチール＆イラスト完全対応版)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -47,6 +55,7 @@ html, body {
   min-height: 100vh;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 /* Hero Banner */
@@ -56,7 +65,7 @@ html, body {
   background-size: cover;
   background-position: center;
   border-bottom: 1px solid var(--gold-dim);
-  padding: 28px 24px 20px;
+  padding: calc(28px + env(safe-area-inset-top)) 24px 20px;
 }
 
 .hero-inner {
@@ -897,7 +906,7 @@ html, body {
 
 @media (max-width: 768px) {
   .hero-header {
-    padding: 18px 14px 14px;
+    padding: calc(18px + env(safe-area-inset-top)) 14px 14px;
   }
   .main-container {
     padding: 12px 12px 95px;
